@@ -9,7 +9,10 @@ class CovidDatabase:
     def __init__(self, db_name='data/covid_data.db'):
         self.db_name = db_name
         # Ensure data directory exists
-        os.makedirs(os.path.dirname(self.db_name), exist_ok=True)
+        try:
+            os.makedirs(os.path.dirname(self.db_name), exist_ok=True)
+        except Exception as e:
+            print(f"Warning: Could not create data directory: {e}")
         self.create_tables()
     
     def create_tables(self):
@@ -158,7 +161,10 @@ class UserDatabase:
     def __init__(self, db_name='data/users.db'):
         self.db_name = db_name
         # Ensure data directory exists
-        os.makedirs(os.path.dirname(self.db_name), exist_ok=True)
+        try:
+            os.makedirs(os.path.dirname(self.db_name), exist_ok=True)
+        except Exception as e:
+            print(f"Warning: Could not create data directory: {e}")
         self.create_tables()
     
     def create_tables(self):

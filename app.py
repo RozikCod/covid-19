@@ -13,7 +13,11 @@ st.set_page_config(
 # Initialize databases
 @st.cache_resource
 def init_databases():
-    return CovidDatabase(), UserDatabase()
+    try:
+        return CovidDatabase(), UserDatabase()
+    except Exception as e:
+        st.error(f"Database initialization error: {e}")
+        st.stop()
 
 covid_db, user_db = init_databases()
 
