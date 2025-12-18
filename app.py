@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import streamlit as st
 from database import CovidDatabase, UserDatabase
 
@@ -27,7 +28,15 @@ if 'page' not in st.session_state:
     st.session_state.page = 'login'
 
 # Import page modules from pages directory
-from pages import auth, dashboard, compare, add_case, users
+import sys
+import os
+sys.path.append(os.path.dirname(__file__))
+
+from pages.auth import login_page, register_page
+from pages.dashboard import show as dashboard_show
+from pages.compare import show as compare_show
+from pages.add_case import show as add_case_show
+from pages.users import show as users_show
 
 def main():
     # Custom CSS
@@ -62,9 +71,9 @@ def main():
     if not st.session_state.logged_in:
         # Authentication pages
         if st.session_state.page == 'login':
-            auth.login_page(user_db)
+            login_page(user_db)
         else:
-            auth.register_page(user_db)
+            register_page(user_db)
     else:
         # Main application with sidebar navigation
         with st.sidebar:
@@ -114,13 +123,13 @@ def main():
         page_value = menu_options[page]
         
         if page_value == "dashboard":
-            dashboard.show(covid_db)
+            dashboard_show(covid_db)
         elif page_value == "compare":
-            compare.show(covid_db)
+            compare_show(covid_db)
         elif page_value == "add_case":
-            add_case.show(covid_db)
+            add_case_show(covid_db)
         elif page_value == "users":
-            users.show(user_db)
+            users_show(user_db)
 
 if __name__ == "__main__":
     main()

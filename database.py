@@ -1,11 +1,15 @@
+# -*- coding: utf-8 -*-
 import sqlite3
-import bcrypt
+import hashlib
 from datetime import datetime
 import pandas as pd
+import os
 
 class CovidDatabase:
     def __init__(self, db_name='data/covid_data.db'):
         self.db_name = db_name
+        # Ensure data directory exists
+        os.makedirs(os.path.dirname(self.db_name), exist_ok=True)
         self.create_tables()
     
     def create_tables(self):
@@ -153,6 +157,8 @@ class CovidDatabase:
 class UserDatabase:
     def __init__(self, db_name='data/users.db'):
         self.db_name = db_name
+        # Ensure data directory exists
+        os.makedirs(os.path.dirname(self.db_name), exist_ok=True)
         self.create_tables()
     
     def create_tables(self):
@@ -178,7 +184,7 @@ class UserDatabase:
         # Create default admin if not exists
         cursor.execute('SELECT username FROM users WHERE username = ?', ('admin',))
         if not cursor.fetchone():
-            admin_password = bcrypt.hashpw('admin123'.encode('utf-8'), bcrypt.gensalt())
+            admin_password = hashlib.sha256('admin123'.encode('utf-8')).hexdigest()
             cursor.execute('''
                 INSERT INTO users (username, password_hash, full_name, role)
                 VALUES (?, ?, ?, ?)
@@ -201,7 +207,7 @@ class UserDatabase:
                 return False, "Username already exists"
             
             # Hash password
-            password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+            password_hash = hashlib.sha256(password.encode('utf-8')).hexdigest()
             
             # Insert new user
             cursor.execute('''
@@ -242,7 +248,7 @@ class UserDatabase:
                 return False, "Account is disabled", None
             
             # Verify password
-            if bcrypt.checkpw(password.encode('utf-8'), password_hash):
+            if hashlib.sha256(password.encode('utf-8')).hexdigest() == password_hash:
                 # Update login statistics
                 cursor.execute('''
                     UPDATE users 

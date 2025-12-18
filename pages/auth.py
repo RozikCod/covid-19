@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import streamlit as st
 
 def login_page(user_db):
