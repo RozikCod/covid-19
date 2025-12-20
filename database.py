@@ -223,7 +223,7 @@ class UserDatabase:
             cursor.execute('''
                 INSERT INTO users (username, password_hash, full_name, email, role)
                 VALUES (?, ?, ?, ?, ?)
-            ''', (username, password_hash, full_name, email, role))
+            ''', (username, password_hash_b64, full_name, email, role))
             
             conn.commit()
             conn.close()
