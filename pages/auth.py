@@ -61,6 +61,7 @@ def register_page(user_db):
             email = st.text_input("Email", placeholder="Your email (optional)")
             password = st.text_input("Password *", type="password", placeholder="Choose a password")
             confirm = st.text_input("Confirm Password *", type="password", placeholder="Re-enter password")
+            is_admin = st.checkbox("Register as admin")
             
             st.caption("* Required fields | Password must be at least 6 characters long")
             
@@ -81,8 +82,9 @@ def register_page(user_db):
                     # Pass optional fields (can be None)
                     full_name_val = full_name if full_name.strip() else None
                     email_val = email if email.strip() else None
+                    role = 'admin' if is_admin else 'user'
                     
-                    success, msg = user_db.register_user(username, password, full_name_val, email_val)
+                    success, msg = user_db.register_user(username, password, full_name_val, email_val, role)
                     if success:
                         st.success(f"✅ {msg}")
                         st.info("🔐 Please login with your new account")
