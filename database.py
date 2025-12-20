@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import sqlite3
-import hashlib
+import bcrypt
 from datetime import datetime
 import pandas as pd
 import os
@@ -190,11 +190,13 @@ class UserDatabase:
         # Create default admin if not exists
         cursor.execute('SELECT username FROM users WHERE username = ?', ('admin',))
         if not cursor.fetchone():
-            admin_password = hashlib.sha256('admin123'.encode('utf-8')).hexdigest()
+            import base64
+            admin_password = bcrypt.hashpw('admin123'.encode('utf-8'), bcrypt.gensalt())
+            admin_password_b64 = base64.b64encode(admin_password).decode('utf-8')
             cursor.execute('''
                 INSERT INTO users (username, password_hash, full_name, role)
                 VALUES (?, ?, ?, ?)
-            ''', ('admin', admin_password, 'System Administrator', 'admin'))
+            ''', ('admin', admin_password_b64, 'System Administrator', 'admin'))
             conn.commit()
         
         conn.commit()
@@ -213,7 +215,9 @@ class UserDatabase:
                 return False, "Username already exists"
             
             # Hash password
-            password_hash = hashlib.sha256(password.encode('utf-8')).hexdigest()
+            import base64
+            password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+            password_hash_b64 = base64.b64encode(password_hash).decode('utf-8')
             
             # Insert new user
             cursor.execute('''
@@ -254,7 +258,9 @@ class UserDatabase:
                 return False, "Account is disabled", None
             
             # Verify password
-            if hashlib.sha256(password.encode('utf-8')).hexdigest() == password_hash:
+            import base64
+            stored_hash = base64.b64decode(password_hash)
+            if bcrypt.checkpw(password.encode('utf-8'), stored_hash):
                 # Update login statistics
                 cursor.execute('''
                     UPDATE users 
